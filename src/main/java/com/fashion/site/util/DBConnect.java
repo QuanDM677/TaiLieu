@@ -1,30 +1,21 @@
 package com.fashion.site.util;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 public class DBConnect {
 
     public static Connection getConnection() {
-        Connection conn = null;
         try {
-            String dbUrl = System.getenv("DB_URL");
-            String dbUser = System.getenv("DB_USERNAME");
-            String dbPass = System.getenv("DB_PASSWORD");
-            System.out.println(">>> DB_URL = " + dbUrl);
-            System.out.println(">>> DB_USERNAME = " + dbUser);
-
-            if (dbUrl == null || dbUser == null || dbPass == null) {
-                throw new RuntimeException("Thiếu biến môi trường DATABASE!");
-            }
-
-            Class.forName("org.postgresql.Driver");
-            conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-            System.out.println(">>> Kết nối PostgreSQL thành công!");
-            return conn; // trả về connection hợp lệ
-
+            // Lookup DataSource từ Tomcat JNDI
+            InitialContext ctx = new InitialContext();
+            DataSource ds = (DataSource) ctx.lookup("java:comp/env/jdbc/FashionDB");
+            Connection conn = ds.getConnection();
+            System.out.println(">>> Kết nối DB qua DataSource thành công!");
+            return conn;
         } catch (Exception e) {
-            throw new RuntimeException(">>> Lỗi kết nối DB:", e);
+            throw new RuntimeException(">>> Lỗi kết nối DB qua DataSource:", e);
         }
     }
 }
