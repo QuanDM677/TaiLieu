@@ -15,7 +15,7 @@ public class DBConnect {
             String dbUser = System.getenv("DB_USERNAME");
             String dbPass = System.getenv("DB_PASSWORD");
 
-            // Debug Render log
+            // Debug trên Render
             System.out.println("DB_URL = " + dbUrl);
             System.out.println("DB_USERNAME = " + dbUser);
 
@@ -25,30 +25,30 @@ public class DBConnect {
                 );
             }
 
-            // Load PostgreSQL Driver
+            // Driver PostgreSQL
             Class.forName("org.postgresql.Driver");
 
-            // Connect
+            // Kết nối
             conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
             System.out.println(">>> Kết nối PostgreSQL thành công!");
 
             // -------------------------------
-            // TỰ ĐỘNG TẠO BẢNG (Auto migrate)
+            // AUTO CREATE TABLE (Chữ thường)
             // -------------------------------
             try (Statement st = conn.createStatement()) {
 
-                String createUsersTable =
-                        "CREATE TABLE IF NOT EXISTS Users ("
+                String createUsers =
+                        "CREATE TABLE IF NOT EXISTS users ("
                                 + "username VARCHAR(100) PRIMARY KEY, "
                                 + "password VARCHAR(200), "
                                 + "major VARCHAR(200), "
                                 + "school VARCHAR(200)"
                                 + ");";
 
-                st.execute(createUsersTable);
+                st.execute(createUsers);
 
-                String createDocumentsTable =
-                        "CREATE TABLE IF NOT EXISTS Documents ("
+                String createDocuments =
+                        "CREATE TABLE IF NOT EXISTS documents ("
                                 + "id VARCHAR(100) PRIMARY KEY, "
                                 + "title VARCHAR(255), "
                                 + "major VARCHAR(200), "
@@ -58,16 +58,16 @@ public class DBConnect {
                                 + "downloadCount INT DEFAULT 0"
                                 + ");";
 
-                st.execute(createDocumentsTable);
+                st.execute(createDocuments);
 
-                System.out.println(">>> Kiểm tra & tạo bảng thành công!");
+                System.out.println(">>> Tạo bảng users & documents thành công!");
             }
 
         } catch (ClassNotFoundException e) {
             System.err.println("Không tìm thấy driver PostgreSQL");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("Không thể kết nối PostgreSQL hoặc tạo bảng");
+            System.err.println("Không thể kết nối PostgreSQL hoặc lỗi tạo bảng!");
             e.printStackTrace();
         }
 
