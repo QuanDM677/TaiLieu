@@ -8,43 +8,48 @@ public class DBConnect {
     private static Connection conn;
 
     public static Connection getConnection() {
-        try {
-            // Nếu chưa có kết nối hoặc bị đóng
-            if (conn == null || conn.isClosed()) {
-                // Load driver SQL Server
-                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
-                // Cấu hình kết nối
-                String dbUser = "sa";
-                String dbPass = "1234";
-
-                // Nếu dùng SQL Server Express, chú ý instance SQLEXPRESS
-                String dbUrl = "jdbc:sqlserver://localhost\\SQLEXPRESS;" +
-                        "databaseName=fashion_site;" +
-                        "encrypt=true;trustServerCertificate=true;";
-
-                // Kết nối
-                conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-                System.out.println("Kết nối SQL Server thành công!");
+        if (conn != null) {
+            try {
+                if (!conn.isClosed()) return conn;
+            } catch (SQLException e) {
+                throw new RuntimeException("Lỗi kiểm tra kết nối", e);
             }
+        }
+
+        try {
+            // Lấy thông tin database từ biến môi trường (Render)
+            String dbUrl = System.getenv("DB_URL");        // ví dụ: jdbc:postgresql://host:port/dbname
+            String dbUser = System.getenv("DB_USERNAME");
+            String dbPass = System.getenv("DB_PASSWORD");
+
+            if (dbUrl == null || dbUser == null || dbPass == null) {
+                throw new RuntimeException("Chưa thiết lập biến môi trường DB_URL, DB_USERNAME, DB_PASSWORD");
+            }
+
+            // Load driver (PostgreSQL example)
+            Class.forName("org.postgresql.Driver");
+
+            conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
+            System.out.println("Kết nối DB thành công!");
         } catch (ClassNotFoundException e) {
-            System.err.println("Không tìm thấy driver SQL Server: " + e.getMessage());
-            throw new RuntimeException(e);
+            throw new RuntimeException("Không tìm thấy driver DB", e);
         } catch (SQLException e) {
-            System.err.println("Lỗi kết nối SQL: " + e.getMessage());
             throw new RuntimeException("Không thể kết nối CSDL", e);
         }
+
         return conn;
     }
 
     public static void closeConnection() {
-        try {
-            if (conn != null && !conn.isClosed()) {
-                conn.close();
-                System.out.println("Đóng kết nối SQL Server thành công!");
+        if (conn != null) {
+            try {
+                if (!conn.isClosed()) {
+                    conn.close();
+                    System.out.println("Đóng kết nối DB thành công!");
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
