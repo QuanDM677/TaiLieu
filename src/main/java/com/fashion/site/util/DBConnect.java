@@ -8,56 +8,33 @@ public class DBConnect {
 
     public static Connection getConnection() {
         try {
-            // Load driver SQL Server
-            Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            // Load Postgres driver
+            Class.forName("org.postgresql.Driver");
 
-            // Lấy thông tin DB từ environment variables
-            String host = System.getenv("DB_HOST");
-            String dbName = System.getenv("DB_NAME");
-            String user = System.getenv("DB_USER");
-            String pass = System.getenv("DB_PASS");
-            String port = System.getenv("DB_PORT");          // thêm biến port
-            String instance = System.getenv("DB_INSTANCE");  // thêm biến instance nếu có
+            // Lấy từ environment variables hoặc hardcode (test)
+            String host = System.getenv("DB_HOST"); // dpg-d4t0jvfpm1nc73ecg52g-a
+            if (host == null) host = "dpg-d4t0jvfpm1nc73ecg52g-a";
 
-            // Default nếu chưa set env
-            if (host == null) host = "localhost";
-            if (dbName == null) dbName = "FashionSite";
-            if (user == null) user = "sa";
-            if (pass == null) pass = "1234";
-            if (port == null) port = "1433";
+            String port = System.getenv("DB_PORT"); // 5432
+            if (port == null) port = "5432";
 
-            String url;
+            String dbName = System.getenv("DB_NAME"); // fashion_site
+            if (dbName == null) dbName = "fashion_site";
 
-            if (instance != null && !instance.isEmpty()) {
-                // Named instance
-                url = "jdbc:sqlserver://" + host + "\\" + instance + ":" + port
-                        + ";databaseName=" + dbName + ";encrypt=false";
-            } else {
-                // Default instance
-                url = "jdbc:sqlserver://" + host + ":" + port
-                        + ";databaseName=" + dbName + ";encrypt=false";
-            }
+            String user = System.getenv("DB_USER"); // fashion_site
+            if (user == null) user = "fashion_site";
 
-            // Log debug
-            System.out.println("Connecting to DB: " + url + " with user: " + user);
+            String pass = System.getenv("DB_PASS"); // mật khẩu của bạn
+            if (pass == null) pass = "<password>";
+
+            String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+
+            System.out.println("Connecting to DB: " + url);
 
             return DriverManager.getConnection(url, user, pass);
 
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("SQL Server Driver not found!", e);
-        } catch (SQLException e) {
-            throw new RuntimeException("Cannot connect to database! Check host, port, instance, username, password.", e);
-        }
-    }
-
-    // Test nhanh kết nối
-    public static void main(String[] args) {
-        try (Connection conn = getConnection()) {
-            if (conn != null && !conn.isClosed()) {
-                System.out.println("Connection successful!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new RuntimeException("Cannot connect to database!", e);
         }
     }
 }
