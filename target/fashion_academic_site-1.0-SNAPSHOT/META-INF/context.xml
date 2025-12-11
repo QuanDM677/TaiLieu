@@ -3,9 +3,9 @@
               auth="Container"
               type="javax.sql.DataSource"
               driverClassName="org.postgresql.Driver"
-              url="jdbc:postgresql://localhost:5432/fashion_site"
-              username="postgres"
-              password="1234"
+              url="jdbc:postgresql://dpg-d4t8bnkhg0os73co9e20-a.singapore-postgres.render.com:5432/fashion_site_kf06?sslmode=require"
+              username="sa"
+              password="iIa4u2h3Njefzd781AdfNngyDbvxCGny"
               maxTotal="20"
               maxIdle="10"
               maxWaitMillis="-1"/>
