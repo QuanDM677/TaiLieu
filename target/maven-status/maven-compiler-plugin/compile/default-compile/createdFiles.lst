@@ -6,9 +6,11 @@ com\fashion\site\util\DBConnect.class
 com\example\fashion_academic_site\HelloServlet.class
 com\fashion\site\dao\DocumentDAO.class
 com\fashion\site\model\User.class
+com\fashion\site\TestDB.class
 com\fashion\site\servlet\LogoutServlet.class
 com\fashion\site\servlet\FilterServlet.class
 com\fashion\site\servlet\LoginServlet.class
+com\fashion\site\TestDBConnection.class
 com\fashion\site\servlet\SettingsServlet.class
 com\fashion\site\servlet\LocaleServlet.class
 com\fashion\site\servlet\UploadServlet.class
