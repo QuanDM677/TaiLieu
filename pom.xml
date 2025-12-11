@@ -46,11 +46,6 @@
             <version>3.0.1</version>
         </dependency>
         <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>10.2.0.jre17</version>     <!-- hoặc 10.2.0.jre17 / 11.2.1.jre17 … -->
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.6.0</version>
