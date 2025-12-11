@@ -15,26 +15,19 @@ public class DBConnect {
             String dbUser = System.getenv("DB_USERNAME");
             String dbPass = System.getenv("DB_PASSWORD");
 
-            // Debug trên Render
-            System.out.println("DB_URL = " + dbUrl);
-            System.out.println("DB_USERNAME = " + dbUser);
+            System.out.println(">>> DB_URL = " + dbUrl);
+            System.out.println(">>> DB_USERNAME = " + dbUser);
 
             if (dbUrl == null || dbUser == null || dbPass == null) {
-                throw new RuntimeException(
-                        "Thiếu biến môi trường: DB_URL, DB_USERNAME, DB_PASSWORD"
-                );
+                throw new RuntimeException("Thiếu biến môi trường: DB_URL, DB_USERNAME, DB_PASSWORD");
             }
 
-            // Driver PostgreSQL
             Class.forName("org.postgresql.Driver");
 
-            // Kết nối
             conn = DriverManager.getConnection(dbUrl, dbUser, dbPass);
-            System.out.println(">>> Kết nối PostgreSQL thành công!");
+            System.out.println(">>> Kết nối PostgreSQL OK");
 
-            // -------------------------------
-            // AUTO CREATE TABLE (Chữ thường)
-            // -------------------------------
+            // Tạo bảng
             try (Statement st = conn.createStatement()) {
 
                 String createUsers =
@@ -45,6 +38,7 @@ public class DBConnect {
                                 + "school VARCHAR(200)"
                                 + ");";
 
+                System.out.println(">>> RUN SQL = " + createUsers);
                 st.execute(createUsers);
 
                 String createDocuments =
@@ -58,17 +52,16 @@ public class DBConnect {
                                 + "downloadCount INT DEFAULT 0"
                                 + ");";
 
+                System.out.println(">>> RUN SQL = " + createDocuments);
                 st.execute(createDocuments);
 
-                System.out.println(">>> Tạo bảng users & documents thành công!");
+                System.out.println(">>> Bảng users + documents đã đảm bảo tồn tại !");
             }
 
-        } catch (ClassNotFoundException e) {
-            System.err.println("Không tìm thấy driver PostgreSQL");
+        } catch (Exception e) {
+            System.err.println(">>> LỖI KẾT NỐI HOẶC TẠO BẢNG PostgreSQL <<<");
             e.printStackTrace();
-        } catch (SQLException e) {
-            System.err.println("Không thể kết nối PostgreSQL hoặc lỗi tạo bảng!");
-            e.printStackTrace();
+            throw new RuntimeException(e); // ép log hiển thị trên Tomcat
         }
 
         return conn;
