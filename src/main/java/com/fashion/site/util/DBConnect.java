@@ -22,10 +22,10 @@ public class DBConnect {
             if (dbName == null) dbName = "fashion_site";
 
             String user = System.getenv("DB_USER"); // fashion_site
-            if (user == null) user = "fashion_site";
+            if (user == null) user = "sa";
 
             String pass = System.getenv("DB_PASS"); // mật khẩu của bạn
-            if (pass == null) pass = "<password>";
+            if (pass == null) pass = "1234";
 
             String url = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
 
