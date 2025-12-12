@@ -40,7 +40,7 @@ public class SettingsServlet extends HttpServlet {
         user.setPreferredFormats(formats != null ? Arrays.asList(formats) : null);
 
         // Update CSDL
-        userDAO.insert(user); // hoặc tạo update() nếu muốn
+        userDAO.update(user); // hoặc tạo update() nếu muốn
 
         req.setAttribute("success", "Settings updated!");
         req.setAttribute("user", user);
