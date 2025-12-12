@@ -33,12 +33,12 @@
             <a class="btn btn-danger me-2" href="logout"><fmt:message key="logout"/></a>
             <!-- Nút đổi ngôn ngữ -->
             <a href="locale?lang=en"
-               class="btn btn-light btn-sm ${sessionScope.locale == 'en_US' ? 'active' : ''}">
+               class="btn btn-light btn-sm ${sessionScope.locale.language == 'en' ? 'active' : ''}">
                 EN
             </a>
 
             <a href="locale?lang=vi"
-               class="btn btn-light btn-sm ${sessionScope.locale == 'vi_VN' ? 'active' : ''}">
+               class="btn btn-light btn-sm ${sessionScope.locale.language == 'vi' ? 'active' : ''}">
                 VN
             </a>
         </div>

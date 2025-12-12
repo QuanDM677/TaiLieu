@@ -15,21 +15,28 @@ public class LocaleServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String lang = request.getParameter("lang");
         HttpSession session = request.getSession();
 
-        if ("vi".equals(lang)) {
-            session.setAttribute("locale", new Locale("vi", "VN"));
+        Locale locale;
+
+        // Chọn locale đúng chuẩn
+        if ("vi".equalsIgnoreCase(lang)) {
+            locale = new Locale("vi", "VN");
         } else {
-            session.setAttribute("locale", Locale.ENGLISH);
+            locale = new Locale("en", "US");
         }
 
-        // Redirect về trang trước hoặc homepage
+        // Lưu vào session
+        session.setAttribute("locale", locale);
+
+        // Quay lại trang trước
         String referer = request.getHeader("Referer");
-        if (referer != null) {
+        if (referer != null && !referer.contains("/locale")) {
             response.sendRedirect(referer);
         } else {
-            response.sendRedirect("index.jsp");
+            response.sendRedirect("dashboard");
         }
     }
 }
