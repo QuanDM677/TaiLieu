@@ -18,7 +18,10 @@ public class SettingsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         User user = (User) req.getSession().getAttribute("user");
-        if (user == null) { resp.sendRedirect("login"); return; }
+        if (user == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
         req.setAttribute("user", user);
         req.getRequestDispatcher("settings.jsp").forward(req, resp);
@@ -29,20 +32,30 @@ public class SettingsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         User user = (User) req.getSession().getAttribute("user");
-        if (user == null) { resp.sendRedirect("login"); return; }
+        if (user == null) {
+            resp.sendRedirect("login");
+            return;
+        }
 
+        // Lấy dữ liệu từ form
         String major = req.getParameter("major");
         String school = req.getParameter("school");
         String[] formats = req.getParameterValues("preferredFormats");
 
+        // Cập nhật thông tin user
         user.setMajor(major);
         user.setSchool(school);
         user.setPreferredFormats(formats != null ? Arrays.asList(formats) : null);
 
-        // Update CSDL
-        userDAO.update(user); // hoặc tạo update() nếu muốn
+        try {
+            // Chỉ update, không insert => tránh duplicate key
+            userDAO.update(user);
 
-        req.setAttribute("success", "Settings updated!");
+            req.setAttribute("success", "Settings updated successfully!");
+        } catch (Exception e) {
+            req.setAttribute("error", "Update failed: " + e.getMessage());
+        }
+
         req.setAttribute("user", user);
         req.getRequestDispatcher("settings.jsp").forward(req, resp);
     }
