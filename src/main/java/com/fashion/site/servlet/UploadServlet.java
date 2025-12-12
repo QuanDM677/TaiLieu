@@ -7,15 +7,17 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.*;
 import jakarta.servlet.http.*;
 import java.io.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 @WebServlet("/upload")
-@MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10)
+@MultipartConfig(fileSizeThreshold = 2*1024*1024, maxFileSize = 10*1024*1024)
 public class UploadServlet extends HttpServlet {
     private DocumentDAO docDAO = new DocumentDAO();
+    private static final String UPLOAD_DIR = "C:\\fashion_uploads";
 
-    // Thư mục upload ngoài webapp
-    private static final String UPLOAD_DIR = "C:\\fashion_uploads"; // chỉnh theo máy server
+    private static final List<String> ALLOWED_FORMATS = Arrays.asList("pdf","docx","pptx","xlsx","txt","odt");
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -23,19 +25,26 @@ public class UploadServlet extends HttpServlet {
 
         Part filePart = req.getPart("file");
         String title = req.getParameter("title");
-        String major = req.getParameter("major");
-        String school = req.getParameter("school");
 
-        if (filePart == null || filePart.getSize() == 0) {
+        if(filePart == null || filePart.getSize() == 0){
+            req.getSession().setAttribute("error", "Chưa chọn file!");
             resp.sendRedirect("dashboard");
             return;
         }
 
+        // Lấy extension
         String originalFileName = new File(filePart.getSubmittedFileName()).getName();
-        String format = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
+        String format = originalFileName.substring(originalFileName.lastIndexOf(".") + 1).toLowerCase();
 
+        if(!ALLOWED_FORMATS.contains(format)){
+            req.getSession().setAttribute("error", "Chỉ cho phép upload file: " + ALLOWED_FORMATS);
+            resp.sendRedirect("dashboard");
+            return;
+        }
+
+        // Tạo thư mục nếu chưa tồn tại
         File uploadDir = new File(UPLOAD_DIR);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+        if(!uploadDir.exists()) uploadDir.mkdirs();
 
         // Tạo tên file duy nhất
         String newFileName = UUID.randomUUID() + "_" + originalFileName;
@@ -44,15 +53,12 @@ public class UploadServlet extends HttpServlet {
         // Lưu file
         filePart.write(file.getAbsolutePath());
 
-        // Lưu thông tin vào database (đường dẫn tuyệt đối)
-        Document doc = new Document(
-                UUID.randomUUID().toString(),
-                title, major, school,
-                format,
-                file.getAbsolutePath()
-        );
+        // Lưu vào database
+        Document doc = new Document(UUID.randomUUID().toString(), title, "", "", format, file.getAbsolutePath());
         docDAO.insert(doc);
 
+        req.getSession().setAttribute("message", "Upload thành công!");
         resp.sendRedirect("dashboard");
     }
 }
+
