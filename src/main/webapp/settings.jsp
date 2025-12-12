@@ -16,6 +16,14 @@
 <body>
 <%@ include file="header.jsp" %>
 <div class="container mt-5">
+    <c:if test="${not empty sessionScope.message}">
+        <div class="alert alert-success">${sessionScope.message}</div>
+        <c:remove var="message" scope="session"/>
+    </c:if>
+    <c:if test="${not empty sessionScope.error}">
+        <div class="alert alert-danger">${sessionScope.error}</div>
+        <c:remove var="error" scope="session"/>
+    </c:if>
     <h3>Account Settings</h3>
     <c:if test="${not empty success}">
         <div class="alert alert-success">${success}</div>

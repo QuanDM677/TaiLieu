@@ -15,6 +15,13 @@
 </head>
 <body class="bg-light">
 <div class="container mt-5">
+    <c:if test="${not empty error}">
+        <div class="alert alert-danger mt-2">${error}</div>
+    </c:if>
+    <c:if test="${not empty sessionScope.message}">
+        <div class="alert alert-success mt-2">${sessionScope.message}</div>
+        <c:remove var="message" scope="session"/>
+    </c:if>
     <div class="row justify-content-center">
         <div class="col-md-5">
             <div class="card shadow">

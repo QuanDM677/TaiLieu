@@ -25,8 +25,20 @@
 </nav>
 
 <div class="container mt-4">
+
+    <!-- Thông báo -->
+    <c:if test="${not empty sessionScope.message}">
+        <div class="alert alert-success">${sessionScope.message}</div>
+        <c:remove var="message" scope="session"/>
+    </c:if>
+    <c:if test="${not empty sessionScope.error}">
+        <div class="alert alert-danger">${sessionScope.error}</div>
+        <c:remove var="error" scope="session"/>
+    </c:if>
+
     <h2>Dashboard</h2>
     <p>Xin chào, <strong>${sessionScope.user.username}</strong>!</p>
+
     <!-- Filter form -->
     <div class="card mb-4">
         <div class="card-body">
@@ -98,7 +110,6 @@
     </div>
 
     <div class="row">
-
         <!-- Newest documents -->
         <div class="col-md-4">
             <h5>Newest Documents</h5>
@@ -140,7 +151,6 @@
                 </c:forEach>
             </ul>
         </div>
-
     </div>
 
 </div>
