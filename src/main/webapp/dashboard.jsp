@@ -32,8 +32,15 @@
             <a class="btn btn-light me-2" href="settings"><fmt:message key="settings.title"/></a>
             <a class="btn btn-danger me-2" href="logout"><fmt:message key="logout"/></a>
             <!-- Nút đổi ngôn ngữ -->
-            <a href="locale?lang=en" class="btn btn-light btn-sm <c:if test='${sessionScope.locale == "en_US"}'>active</c:if>'">EN</a>
-            <a href="locale?lang=vi" class="btn btn-light btn-sm <c:if test='${sessionScope.locale == "vi_VN"}'>active</c:if>'">VN</a>
+            <a href="locale?lang=en"
+               class="btn btn-light btn-sm ${sessionScope.locale == 'en_US' ? 'active' : ''}">
+                EN
+            </a>
+
+            <a href="locale?lang=vi"
+               class="btn btn-light btn-sm ${sessionScope.locale == 'vi_VN' ? 'active' : ''}">
+                VN
+            </a>
         </div>
     </div>
 </nav>
