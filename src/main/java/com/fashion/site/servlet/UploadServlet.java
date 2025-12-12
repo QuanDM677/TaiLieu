@@ -13,7 +13,9 @@ import java.util.UUID;
 @MultipartConfig(fileSizeThreshold = 1024 * 1024 * 2, maxFileSize = 1024 * 1024 * 10)
 public class UploadServlet extends HttpServlet {
     private DocumentDAO docDAO = new DocumentDAO();
-    private static final String UPLOAD_DIR = "uploads";
+
+    // Thư mục upload ngoài webapp
+    private static final String UPLOAD_DIR = "C:\\fashion_uploads"; // chỉnh theo máy server
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -24,23 +26,33 @@ public class UploadServlet extends HttpServlet {
         String major = req.getParameter("major");
         String school = req.getParameter("school");
 
-        String originalFileName = filePart.getSubmittedFileName();
+        if (filePart == null || filePart.getSize() == 0) {
+            resp.sendRedirect("dashboard");
+            return;
+        }
+
+        String originalFileName = new File(filePart.getSubmittedFileName()).getName();
         String format = originalFileName.substring(originalFileName.lastIndexOf(".") + 1);
 
-        String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIR;
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdir();
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) uploadDir.mkdirs();
 
-        filePart.write(uploadPath + File.separator + originalFileName);
+        // Tạo tên file duy nhất
+        String newFileName = UUID.randomUUID() + "_" + originalFileName;
+        File file = new File(uploadDir, newFileName);
 
+        // Lưu file
+        filePart.write(file.getAbsolutePath());
+
+        // Lưu thông tin vào database (đường dẫn tuyệt đối)
         Document doc = new Document(
                 UUID.randomUUID().toString(),
                 title, major, school,
                 format,
-                UPLOAD_DIR + "/" + originalFileName
+                file.getAbsolutePath()
         );
-
         docDAO.insert(doc);
+
         resp.sendRedirect("dashboard");
     }
 }

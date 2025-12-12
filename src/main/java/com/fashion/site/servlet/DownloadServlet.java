@@ -7,7 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.*;
-import java.util.List;
+import java.net.URLEncoder;
 
 @WebServlet("/download")
 public class DownloadServlet extends HttpServlet {
@@ -20,17 +20,20 @@ public class DownloadServlet extends HttpServlet {
         String id = req.getParameter("id");
         if (id == null) { resp.sendRedirect("dashboard"); return; }
 
-        List<Document> docs = docDAO.findAll();
-        Document doc = docs.stream().filter(d -> d.getId().equals(id)).findFirst().orElse(null);
+        Document doc = docDAO.findById(id);
         if (doc == null) { resp.sendRedirect("dashboard"); return; }
 
-        File file = new File(getServletContext().getRealPath("") + File.separator + doc.getFilePath());
+        File file = new File(doc.getFilePath());
         if (!file.exists()) { resp.sendRedirect("dashboard"); return; }
 
+        // Tăng lượt tải
         docDAO.increaseDownload(id);
 
         resp.setContentType("application/octet-stream");
-        resp.setHeader("Content-Disposition", "attachment;filename=" + file.getName());
+
+        // Encode tên file để tránh lỗi khoảng trắng/ký tự đặc biệt
+        String encodedName = URLEncoder.encode(file.getName(), "UTF-8").replaceAll("\\+", "%20");
+        resp.setHeader("Content-Disposition", "attachment; filename=\"" + encodedName + "\"");
 
         try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
              BufferedOutputStream out = new BufferedOutputStream(resp.getOutputStream())) {

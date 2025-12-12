@@ -7,14 +7,15 @@ import java.util.*;
 
 public class DocumentDAO {
 
+    // Lấy tất cả tài liệu
     public List<Document> findAll() {
         List<Document> list = new ArrayList<>();
         String sql = "SELECT * FROM Documents";
 
         try (Connection c = DBConnect.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+             PreparedStatement ps = c.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Document d = new Document(
                         rs.getString("id"),
@@ -24,9 +25,7 @@ public class DocumentDAO {
                         rs.getString("format"),
                         rs.getString("filePath")
                 );
-                while (rs.getInt("downloadCount") > d.getDownloadCount()) {
-                    d.increaseDownloadCount();
-                }
+                d.setDownloadCount(rs.getInt("downloadCount")); // set trực tiếp từ DB
                 list.add(d);
             }
             return list;
@@ -36,6 +35,35 @@ public class DocumentDAO {
         }
     }
 
+    // Lấy tài liệu theo ID
+    public Document findById(String id) {
+        String sql = "SELECT * FROM Documents WHERE id=?";
+        try (Connection c = DBConnect.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+
+            ps.setString(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Document d = new Document(
+                            rs.getString("id"),
+                            rs.getString("title"),
+                            rs.getString("major"),
+                            rs.getString("school"),
+                            rs.getString("format"),
+                            rs.getString("filePath")
+                    );
+                    d.setDownloadCount(rs.getInt("downloadCount"));
+                    return d;
+                }
+            }
+            return null;
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    // Thêm tài liệu
     public void insert(Document d) {
         String sql = "INSERT INTO Documents(id,title,major,school,format,filePath,downloadCount) VALUES(?,?,?,?,?,?,?)";
         try (Connection c = DBConnect.getConnection();
@@ -49,11 +77,13 @@ public class DocumentDAO {
             ps.setString(6, d.getFilePath());
             ps.setInt(7, d.getDownloadCount());
             ps.executeUpdate();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    // Tăng lượt tải
     public void increaseDownload(String id) {
         String sql = "UPDATE Documents SET downloadCount = downloadCount + 1 WHERE id=?";
         try (Connection c = DBConnect.getConnection();
@@ -61,17 +91,21 @@ public class DocumentDAO {
 
             ps.setString(1, id);
             ps.executeUpdate();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
+    // Xóa tài liệu
     public void delete(String id) {
         String sql = "DELETE FROM Documents WHERE id=?";
         try (Connection c = DBConnect.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
+
             ps.setString(1, id);
             ps.executeUpdate();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
