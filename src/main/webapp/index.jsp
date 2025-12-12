@@ -4,7 +4,6 @@
 <%
     Object userObj = session.getAttribute("user");
     if(userObj != null){
-        // Redirect đến dashboard
         response.sendRedirect("dashboard");
         return;
     }
@@ -15,11 +14,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome - Academic Share</title>
+    <title><fmt:message key="welcome.title"/></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-
 <%@ include file="header.jsp" %>
 
 <div class="container text-center mt-5">

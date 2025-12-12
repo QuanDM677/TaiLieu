@@ -1,9 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%
     com.fashion.site.model.User user = (com.fashion.site.model.User) session.getAttribute("user");
     if(user == null){ response.sendRedirect("login"); return; }
 %>
+<fmt:setLocale value="${sessionScope.locale != null ? sessionScope.locale : 'en_US'}"/>
+<fmt:setBundle basename="messages"/>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,16 +27,18 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Academic Share</a>
-        <div class="d-flex">
+        <div class="d-flex ms-auto">
             <button class="btn btn-light me-2" onclick="toggleDarkMode()">Dark Mode</button>
-            <a class="btn btn-light me-2" href="settings">Settings</a>
-            <a class="btn btn-danger" href="logout">Logout</a>
+            <a class="btn btn-light me-2" href="settings"><fmt:message key="settings.title"/></a>
+            <a class="btn btn-danger me-2" href="logout"><fmt:message key="logout"/></a>
+            <!-- Nút đổi ngôn ngữ -->
+            <a href="locale?lang=en" class="btn btn-light btn-sm <c:if test='${sessionScope.locale == "en_US"}'>active</c:if>'">EN</a>
+            <a href="locale?lang=vi" class="btn btn-light btn-sm <c:if test='${sessionScope.locale == "vi_VN"}'>active</c:if>'">VN</a>
         </div>
     </div>
 </nav>
 
 <div class="container mt-4">
-    <!-- Thông báo -->
     <c:if test="${not empty sessionScope.message}">
         <div class="alert alert-success">${sessionScope.message}</div>
         <c:remove var="message" scope="session"/>
@@ -44,25 +49,23 @@
     </c:if>
 
     <h2>Dashboard</h2>
-    <p>Xin chào, <strong>${user.username}</strong>!</p>
+    <p><fmt:message key="dashboard.greeting"><fmt:param value="${user.username}"/></fmt:message></p>
 
-    <!-- Danh sách tài liệu với phân trang -->
     <div class="card mb-4">
         <div class="card-body">
-            <h5>All Documents</h5>
+            <h5><fmt:message key="dashboard.allDocuments"/></h5>
             <ul class="list-group">
                 <c:forEach var="doc" items="${pagedDocs}">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>${doc.title} (${doc.format})</span>
                         <div>
-                            <a href="download?id=${doc.id}" class="btn btn-sm btn-primary">Download</a>
-                            <a href="delete?id=${doc.id}" class="btn btn-sm btn-danger">Delete</a>
+                            <a href="download?id=${doc.id}" class="btn btn-sm btn-primary"><fmt:message key="dashboard.download"/></a>
+                            <a href="delete?id=${doc.id}" class="btn btn-sm btn-danger"><fmt:message key="dashboard.delete"/></a>
                         </div>
                     </li>
                 </c:forEach>
             </ul>
 
-            <!-- Nút phân trang -->
             <c:if test="${totalPages > 1}">
                 <nav class="mt-3">
                     <ul class="pagination">
@@ -77,39 +80,36 @@
         </div>
     </div>
 
-    <!-- Các danh sách đặc biệt -->
     <div class="row">
         <div class="col-md-4">
-            <h5>Newest Documents</h5>
+            <h5><fmt:message key="dashboard.newestDocuments"/></h5>
             <ul class="list-group">
                 <c:forEach var="doc" items="${newestDocs}">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                             ${doc.title} (${doc.format})
-                        <a href="download?id=${doc.id}" class="btn btn-sm btn-primary">Tải</a>
+                        <a href="download?id=${doc.id}" class="btn btn-sm btn-primary"><fmt:message key="dashboard.download"/></a>
                     </li>
                 </c:forEach>
             </ul>
         </div>
-
         <div class="col-md-4">
-            <h5>Popular Documents</h5>
+            <h5><fmt:message key="dashboard.popularDocuments"/></h5>
             <ul class="list-group">
                 <c:forEach var="doc" items="${popularDocs}">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                             ${doc.title} (${doc.format}) - ${doc.downloadCount} downloads
-                        <a href="download?id=${doc.id}" class="btn btn-sm btn-primary">Tải</a>
+                        <a href="download?id=${doc.id}" class="btn btn-sm btn-primary"><fmt:message key="dashboard.download"/></a>
                     </li>
                 </c:forEach>
             </ul>
         </div>
-
         <div class="col-md-4">
-            <h5>Recommended for You</h5>
+            <h5><fmt:message key="dashboard.recommendedDocuments"/></h5>
             <ul class="list-group">
                 <c:forEach var="doc" items="${recommendedDocs}">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                             ${doc.title} (${doc.format})
-                        <a href="download?id=${doc.id}" class="btn btn-sm btn-primary">Tải</a>
+                        <a href="download?id=${doc.id}" class="btn btn-sm btn-primary"><fmt:message key="dashboard.download"/></a>
                     </li>
                 </c:forEach>
             </ul>
